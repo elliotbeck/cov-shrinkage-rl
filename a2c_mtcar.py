@@ -34,9 +34,9 @@ parser = argparse.ArgumentParser(description='PyTorch A2C solution of MountainCa
 parser.add_argument('--gamma', type=float, default=0.986)
 parser.add_argument('--actor_lr', type=float, default=1e-5)
 parser.add_argument('--critic_lr', type=float, default=5e-4)  
-parser.add_argument('--hidden_dim', type=int, default=128)
-parser.add_argument('--max_episode', type=int, default=100)
-parser.add_argument('--seed', type=int, default=87)
+parser.add_argument('--hidden_dim', type=int, default=200)
+parser.add_argument('--max_episode', type=int, default=1000)
+parser.add_argument('--seed', type=int, default=1)
 
 # parse arguments
 cfg = parser.parse_args()
@@ -44,8 +44,8 @@ cfg = parser.parse_args()
 # set up game environment
 env = gym.make('MountainCarContinuous-v0')
 
-# set the seed
-torch.manual_seed(cfg.seed)
+# # set the seed
+# torch.manual_seed(cfg.seed)
 
 # generate some data to fit scaler and featurizer
 observation_examples = np.array([env.observation_space.sample() for x in range(10000)])
@@ -106,8 +106,8 @@ def main():
             next_state, reward, done, _ = env.step([action])[0:4]
             
             # update episode score
-            episode_score += reward
-            
+            episode_score += reward # type: ignore  
+                      
             # process the next state to get the features
             proc_state_next = process_state(next_state, scaler, featurizer) 
 
@@ -120,22 +120,25 @@ def main():
             # calculate the td error
             td_error = target - get_state_value(proc_state, critic, device)
             
-            # update actor (gradient descent) 
-            update_actor(state, 
-                         actor, 
-                         action, 
-                         td_error, 
-                         actor_optimizer, 
-                         device, 
-                         proc_state)
-            
-            # update critic (gradient descent) 
-            update_critic(state, 
-                          target, 
-                          critic, 
-                          critic_optimizer, 
-                          device, 
-                          proc_state)
+            # only update the actor and critic every 10 steps to reduce variance
+            # of gradient descent steps
+            if t%10==0: 
+                # update actor (gradient descent) 
+                update_actor(state, 
+                            actor, 
+                            action, 
+                            td_error, 
+                            actor_optimizer, 
+                            device, 
+                            proc_state)
+                
+                # update critic (gradient descent) 
+                update_critic(state, 
+                            target, 
+                            critic, 
+                            critic_optimizer, 
+                            device, 
+                            proc_state)
 
             if done:
                 
@@ -150,7 +153,8 @@ def main():
                 plt.title('reward')
                 plt.xlabel('episode')
                 plt.plot(last_score_plot, 'b-')
-                plt.plot(avg_score_plot, 'r-')
+                plt.plot(avg_score_plot, 'g-')
+                plt.hlines(90, 0, len(last_score_plot)-1, colors='r', linestyles='dashed') # type: ignore      
                 plt.draw()
                 plt.pause(0.001)
                 
@@ -162,7 +166,7 @@ def main():
         stats.append(episode_score)
             
         # print episode results
-        print("Episode: {}, reward: {}, steps: {}.".format(i_episode, episode_score, t))
+        print("Episode: {}, reward: {}, steps: {}.".format(i_episode, episode_score, t)) # type: ignore
         
         # check if game is solved successfully
         if np.mean(stats[-100:]) > 90 and len(stats) >= 100:
