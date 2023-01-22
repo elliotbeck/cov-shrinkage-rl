@@ -148,6 +148,7 @@ def main():
                 
                 # plot intermediate results
                 plt.title('reward')
+                plt.xlabel('episode')
                 plt.plot(last_score_plot, 'b-')
                 plt.plot(avg_score_plot, 'r-')
                 plt.draw()
@@ -175,4 +176,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-    plt.pause(0)
+    plt.savefig('plots/reward_a2c_mtcar_cont.png')
