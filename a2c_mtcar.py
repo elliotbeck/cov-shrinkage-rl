@@ -1,4 +1,4 @@
-# taken from https://github.com/zzzxxxttt/pytorch_simple_RL/blob/master/a2c_mtcar.py
+# idea taken from https://github.com/zzzxxxttt/pytorch_simple_RL/blob/master/a2c_mtcar.py
 
 # import libraries
 import argparse
