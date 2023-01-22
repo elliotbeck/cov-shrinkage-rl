@@ -166,7 +166,9 @@ def main():
         # check if game is solved successfully
         if np.mean(stats[-100:]) > 90 and len(stats) >= 100:
             print(np.mean(stats[-100:]))
-            print("Solved")
+            print("Solved successfully!")
+        else:
+            print("Not solved successfully...")
         
     # return the average score of the last 100 episodes
     return np.mean(stats[-100:])
