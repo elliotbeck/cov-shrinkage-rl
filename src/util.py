@@ -1,9 +1,7 @@
 # libraries
 import torch
 from torch.distributions import Normal
-from torch.nn.utils import clip_grad_norm_
 import torch.nn.functional as F
-import numpy as np
 
 def process_state(state, scaler, featurizer):
   scaled = scaler.transform([state])
@@ -20,8 +18,8 @@ def get_action(state, actor, env, device, process_state):
     return action.item()
 
 
-def get_state_value(state, critic, process_state, device):
-    state = torch.from_numpy(process_state).float().to(device)
+def get_state_value(state, critic, device):
+    state = torch.from_numpy(state).float().to(device)
     state_value = critic(state)
     return state_value.item()
 
