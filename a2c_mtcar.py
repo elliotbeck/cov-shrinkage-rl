@@ -121,8 +121,9 @@ def main():
             td_error = target - get_state_value(proc_state, critic, device)
             
             # only update the actor and critic every 10 steps to reduce variance
-            # of gradient descent steps
-            if t%10==0: 
+            # of gradient descent steps. Furthermore, only update the actor for the 
+            # first 200 episodes
+            if t%10==0 and i_episode < 200: 
                 # update actor (gradient descent) 
                 update_actor(state, 
                             actor, 
