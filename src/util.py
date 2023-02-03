@@ -8,6 +8,7 @@ def get_action(state, actor, env, device):
     state = np.expand_dims(np.array(state.values), axis=0)
     state = torch.from_numpy(state).float().to(device)
     action_mu, action_sigma = actor(state)
+    print(action_mu); print(action_sigma)
     action_dist = torch.distributions.normal.Normal(action_mu, action_sigma)
     action = action_dist.sample()
     action = torch.clamp(action, float(env.action_space.low[0]), float(env.action_space.high[0]))
