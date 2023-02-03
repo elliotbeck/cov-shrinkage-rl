@@ -54,8 +54,8 @@ avg_score_plot = [0.]
 
 # define arguments
 parser = argparse.ArgumentParser(description='PyTorch A2C solution of MountainCarContinuous-V0')
-parser.add_argument('--gamma', type=float, default=0.986)
-parser.add_argument('--actor_lr', type=float, default=1e-3)
+parser.add_argument('--gamma', type=float, default=0.98)
+parser.add_argument('--actor_lr', type=float, default=5e-4)
 parser.add_argument('--critic_lr', type=float, default=5e-3)  
 parser.add_argument('--hidden_dim', type=int, default=200)
 parser.add_argument('--max_episode', type=int, default=1000)

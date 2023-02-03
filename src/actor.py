@@ -26,11 +26,11 @@ class Actor(nn.Module):
 
     def forward(self, x):
         x = F.relu(F.max_pool2d(self.conv1(x), 2))
-        # x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
-        x = F.relu(F.max_pool2d(self.conv2(x), 2))
+        x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
+        # x = F.relu(F.max_pool2d(self.conv2(x), 2))
         x = flatten(x.view(x.shape[0],-1))
         x = F.relu(self.fc_hidden(x))
         # x = F.dropout(x, training=self.training)
-        mu = self.fc_mu(x)
+        mu = F.softplus(self.fc_mu(x)) + 1e-5
         sigma = F.softplus(self.fc_sigma(x)) + 1e-5
         return mu, sigma

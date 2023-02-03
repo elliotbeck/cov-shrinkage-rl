@@ -9,7 +9,7 @@ def get_action(state, actor, env, device):
     state = torch.from_numpy(state).float().to(device)
     action_mu, action_sigma = actor(state)
     print(action_mu); print(action_sigma)
-    action_dist = torch.distributions.normal.Normal(action_mu, action_sigma)
+    action_dist = torch.distributions.beta.Beta(action_mu, action_sigma)
     action = action_dist.sample()
     action = torch.clamp(action, float(env.action_space.low[0]), float(env.action_space.high[0]))
     return action.item()
@@ -26,7 +26,7 @@ def update_actor(state, actor, action, advantage, actor_optimizer, device):
     state = np.expand_dims(np.array(state.values), axis=0)
     state = torch.from_numpy(state).float().to(device)
     action_mu, action_sigma = actor(state)
-    action_dist = torch.distributions.normal.Normal(action_mu, action_sigma)
+    action_dist = torch.distributions.beta.Beta(action_mu, action_sigma)
     act_loss = -action_dist.log_prob(torch.tensor(action).to(device)) * advantage
     entropy = action_dist.entropy()
     loss = act_loss - 1e-4 * entropy

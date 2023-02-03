@@ -23,8 +23,8 @@ class Critic(nn.Module):
 
     def forward(self, x):
         x = F.relu(F.max_pool2d(self.conv1(x), 2))
-        # x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
-        x = F.relu(F.max_pool2d(self.conv2(x), 2))
+        x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
+        # x = F.relu(F.max_pool2d(self.conv2(x), 2))
         x = flatten(x.view(x.shape[0],-1))
         x = F.relu(self.fc_hidden(x))
         value = self.fc_value(x)
