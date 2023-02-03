@@ -2,36 +2,22 @@ import numpy as np
 import pandas as pd
 from gym.utils import seeding
 import gym
-import matplotlib
-matplotlib.use('Agg')
-from typing import Union
 from itertools import chain
 
 class portfolio_shrink_env(gym.Env):
-    def __init__(self, df):
+    def __init__(self, df, vintages):
         super().__init__()
         self.stock_returns = df
-        stock_num = self.stock_returns.shape[1]
         self.action_space = gym.spaces.Box(low = 0.0, 
                                            high = 1.0, 
                                            shape=(1, ), 
                                            dtype=np.float32)
-        self.observation_space = gym.spaces.Box(low = -100, 
-                                                high = 100, 
-                                                shape=(1, stock_num + 1), 
-                                                dtype=np.float32)
         self.done = False
         self.state = None
         self.reward = None
         self.info = None
-        self.reward_type = 'volatility'
-        self.date = df.index[0]
-        self.date_range = df.index
+        self.vintages = vintages
         self.portfolio = []
-        
-    def seed(self, seed=None):
-        self.np_random, seed = seeding.np_random(seed)
-        return [seed]
 
     def reset(self):
         '''
@@ -41,12 +27,13 @@ class portfolio_shrink_env(gym.Env):
         Returns:
             state: np.array
         '''
-        self.state = self.stock_returns.iloc[0]
+        self.date = self.vintages[0]
+        self.state = self.stock_returns.loc[self.stock_returns['vintage_train'] == self.vintages[0], :]
         self.done = False
         self.reward = None
         action = self.action_space.sample()
         
-        state, reward, done, info = self.step(action)
+        state, _, _, _ = self.step(action)
 
         return state
 
@@ -71,32 +58,48 @@ class portfolio_shrink_env(gym.Env):
         self.done = self.is_done()
         
         # get the next state
-        self.date += 1 # TODO: change this to next date
+        self.date = self.vintages[np.where(self.date==self.vintages)[0]+1]
         self.state = self.get_state()
 
         return self.state, self.reward, self.done, {}
+    
+    def render(self):
+        s = "position: {}  reward: {}  info: {}"
+        print(s.format(self.state, self.reward, self.info))
 
     def get_state(self):
         '''
         Take agent's action and get back env's next state
-        Args:
-            action: a number (shrinkage intensity)
         Return:
-            None
+            next state
         '''
-        if not self.done:
-            return self.stock_returns[self.date]
-        else:
-            print('The end of period\n')
-            # exit()
+        data = self.stock_returns.loc[self.stock_returns['vintage_train'].values == self.date, :]
+        return data
+
 
     def get_portfolio(self, action):
+        
+        # make artificial permnos TODO: replace with real permnos
+        permnos = np.arange(0, 100)
+        permnos_vector = np.repeat(permnos, 1260)
+        
+        # replace permnos
+        self.state.loc[:, 'permno'] = permnos_vector
+
+        # transform to wide format
+        self.state_wide = pd.pivot(self.state,
+                             columns='permno',
+                             values='stock_return',
+                             index='date')
+
+        # get the covariance matrix
+        covariance_matrix = self.state_wide.cov()
+        
         # shrink the covariance matrix
-        covariance_matrix = self.state.cov()
         covariance_shrunk = self.get_shrank_cov(
             covariance_matrix = covariance_matrix,
-            shrink_target=np.identity(covariance_matrix.shape[1]),
             a=action)
+        
         # get the portfolio weights
         portfolio = self.get_GMVP(covariance_matrix = covariance_shrunk)
         return portfolio
@@ -105,7 +108,7 @@ class portfolio_shrink_env(gym.Env):
         '''
         Check whether agent arrive to the endpoint of the epoc
         '''
-        if self.date != self.date[-1]:
+        if self.date != self.vintages[-2]:
             self.done = False
         else:
             self.done = True
@@ -116,10 +119,9 @@ class portfolio_shrink_env(gym.Env):
         '''
         Get portfolio daily returns time series for one period
         '''
-        stocks_returns = self.state
         portfolio = self.get_portfolio(action)
         self.portfolio.append(portfolio) # record
-        portfolio_returns = stocks_returns @ portfolio
+        portfolio_returns = self.state_wide @ portfolio
         portfolio_returns = portfolio_returns.values.tolist()
         portfolio_returns = list(chain.from_iterable(portfolio_returns))
 
@@ -136,29 +138,27 @@ class portfolio_shrink_env(gym.Env):
         portfolio_returns = np.array(portfolio_returns)
 
         # calculate volatility
-        volatility = portfolio_returns.std()* np.sqrt(252) # annualized        
+        volatility = portfolio_returns.std() * np.sqrt(252) # annualized        
         return volatility
-        
-    def render (self):
-        s = "position: {}  reward: {}  info: {}"
-        print(s.format(self.state, self.reward, self.info))
         
     def get_shrank_cov(
                     self, 
-                    shrink_target: Union[pd.DataFrame, np.array],
                     a: int,
-                    covariance_matrix: Union[pd.DataFrame, np.array] = None
-                    ) -> Union[pd.DataFrame, np.array]:
+                    covariance_matrix):
         '''
         Calculate shrank covariance matrix given shrink target and 
         shrink intensity.
         '''
+        # get the shrink target
+        variances = np.diag(covariance_matrix) 
+        shrink_target = np.eye(covariance_matrix.shape[0]) * np.mean(variances)
+        
         # initialization
         R_1 = covariance_matrix
         R_2 = shrink_target
 
         # cov calculation
-        H = (1 - a) * R_1 + a * R_2 # new shrank covariance matrix
+        H = (1 - a) * R_1.values + a * R_2 # new shraxnk covariance matrix
 
         return H
 
@@ -184,3 +184,7 @@ class portfolio_shrink_env(gym.Env):
 
         # reshape to column vector
         return x.reshape((len(x), 1))
+    
+    def seed(self, seed=None):
+        self.np_random, seed = seeding.np_random(seed)
+        return [seed]

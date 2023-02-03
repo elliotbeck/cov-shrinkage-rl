@@ -1,8 +1,21 @@
 # libraries
 import pandas as pd
+import scipy.io as sio
+
+
+import h5py
+import numpy as np
+filepath = 'data/Data_p100_n1260.mat'    
+import hdf5storage
+mat = hdf5storage.loadmat(filepath)
+mat = pd.DataFrame(mat)
+mat.iloc[(1260):(1260+10), 0:5]
+
 
 # load data
-data_daily = pd.read_csv('data/CRSPdaily.csv')
+data_daily = pd.read_csv('data/Data_p100_n1260.csv')
+data_daily.shape
+data_daily.iloc[0:500, 0:5]
 
 # convert date to datetime
 data_daily['date'] = pd.to_datetime(data_daily['date'], format='%Y%m%d')
