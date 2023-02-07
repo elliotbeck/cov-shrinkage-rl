@@ -1,4 +1,4 @@
-Various deep RL algortihms applied to various games
+Various deep RL algorithms applied to various games
 ==============================
 
 The goal of this project is to find a deep RL algorithm that
