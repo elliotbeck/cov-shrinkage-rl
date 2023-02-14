@@ -5,10 +5,10 @@ import torch.nn.functional as F
 import numpy as np
 
 def get_action(state, actor, env, device):
-    state = np.expand_dims(np.array(state.values), axis=0)
+    state = np.expand_dims(state, axis=0)
     state = torch.from_numpy(state).float().to(device)
     action_mu, action_sigma = actor(state)
-    print(action_mu); print(action_sigma)
+    # print(action_mu); print(action_sigma)
     action_dist = torch.distributions.beta.Beta(action_mu, action_sigma)
     action = action_dist.sample()
     action = torch.clamp(action, float(env.action_space.low[0]), float(env.action_space.high[0]))
@@ -16,14 +16,14 @@ def get_action(state, actor, env, device):
 
 
 def get_state_value(state, critic, device):
-    state = np.expand_dims(np.array(state.values), axis=0)
+    state = np.expand_dims(state, axis=0)
     state = torch.from_numpy(state).float().to(device)
     state_value = critic(state)
     return state_value.item()
 
 
 def update_actor(state, actor, action, advantage, actor_optimizer, device):
-    state = np.expand_dims(np.array(state.values), axis=0)
+    state = np.expand_dims(state, axis=0)
     state = torch.from_numpy(state).float().to(device)
     action_mu, action_sigma = actor(state)
     action_dist = torch.distributions.beta.Beta(action_mu, action_sigma)
@@ -37,7 +37,7 @@ def update_actor(state, actor, action, advantage, actor_optimizer, device):
 
 
 def update_critic(state, target, critic, critic_optimizer, device):
-    state = np.expand_dims(np.array(state.values), axis=0)
+    # state = np.expand_dims(state, axis=0)
     state = torch.from_numpy(state).float().to(device)
     state_value = critic(state)
     loss = F.mse_loss(state_value.float(), torch.tensor([target]).float().to(device))
