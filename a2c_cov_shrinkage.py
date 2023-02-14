@@ -206,6 +206,9 @@ def main():
                 # plt.pause(0.001)
                 plt.plot(actions, 'c-', label='agent')
                 plt.plot(actions_benchmark, 'r-', label='benchmark')
+                plt.title('actions over time')
+                plt.xlabel('episode')
+                plt.legend()
                 plt.savefig('plots/actions_a2c_cov_shrink_episode_' + str(i_episode) + '.png')
                 
                 # go to next episode
