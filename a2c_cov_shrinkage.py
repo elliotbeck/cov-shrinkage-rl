@@ -20,8 +20,8 @@ from src.critic import Critic
 from env.portfolio_shrink_env import portfolio_shrink_env
 from src.util import get_action, update_actor, update_critic, get_state_value
 
-import matplotlib
-matplotlib.use('TkAgg')
+# import matplotlib
+# matplotlib.use('TkAgg')
 
 # load the data
 filepath = 'data/Data_p100_n1260.mat'
@@ -85,9 +85,9 @@ critic_optimizer = optim.Adam(critic.parameters(), lr=cfg.critic_lr)
 # define the main function to run the game iterartively
 def main():
     stats = []
-    plt.ion()
-    plt.grid()
-    plt.show()
+    # plt.ion()
+    # plt.grid()
+    # plt.show()
     for i_episode in range(cfg.max_episode):
         
         # set up a new game
@@ -189,15 +189,15 @@ def main():
                 last_score_benchmark_plot.append(float(episode_score_benchmark))
                 print(last_score_plot)
                 print(last_score_benchmark_plot)
-                # plot intermediate results
-                plt.title('reward')
-                plt.xlabel('episode')
-                plt.plot(last_score_plot, 'c-', legend='agent')
-                plt.plot(avg_score_plot, 'g-', legend='agent average')
-                plt.plot(last_score_benchmark_plot, 'r-', legend='benchmark')
-                plt.plot(avg_score_benchmark_plot, 'y-', legend='benchmark average')
-                plt.draw()
-                plt.pause(0.001)
+                # # plot intermediate results
+                # plt.title('reward')
+                # plt.xlabel('episode')
+                # plt.plot(last_score_plot, 'c-', legend='agent')
+                # plt.plot(avg_score_plot, 'g-', legend='agent average')
+                # plt.plot(last_score_benchmark_plot, 'r-', legend='benchmark')
+                # plt.plot(avg_score_benchmark_plot, 'y-', legend='benchmark average')
+                # plt.draw()
+                # plt.pause(0.001)
                 
                 # go to next episode
                 break
