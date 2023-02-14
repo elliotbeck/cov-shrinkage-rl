@@ -210,6 +210,7 @@ def main():
                 plt.xlabel('episode')
                 plt.legend()
                 plt.savefig('plots/actions_a2c_cov_shrink_episode_' + str(i_episode) + '.png')
+                plt.clf()
                 
                 # go to next episode
                 break
