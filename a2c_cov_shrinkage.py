@@ -97,6 +97,10 @@ def main():
         episode_score = 0
         episode_score_benchmark = 0
         
+        # save actions for plots
+        actions = []
+        actions_benchmark = []
+        
         # iterate through the steps of the game
         for t in count():
                 
@@ -119,6 +123,8 @@ def main():
                         
             # get the action of the agent
             action = get_action(state_shrinkage, actor, env, device)
+            actions.append(action)
+            actions_benchmark.append(state_shrinkage[0])
             
             # # print action
             # print(str(t) + " " + str(action-state_shrinkage[0]))
@@ -198,6 +204,9 @@ def main():
                 # plt.plot(avg_score_benchmark_plot, 'y-', legend='benchmark average')
                 # plt.draw()
                 # plt.pause(0.001)
+                plt.plot(actions, 'c-', label='agent')
+                plt.plot(actions_benchmark, 'r-', label='benchmark')
+                plt.savefig('plots/actions_a2c_cov_shrink_episode_' + str(i_episode) + '.png')
                 
                 # go to next episode
                 break
