@@ -26,7 +26,9 @@ class portfolio_shrink_env(gym.Env):
         Returns:
             state: np.array
         '''
-        self.date = self.vintages[0]
+        # random restarts within the first 5 years
+        start_month = np.random.randint(0, 60)
+        self.date = self.vintages[start_month]
         self.state = self.stock_returns.loc[self.stock_returns['vintage_train'] == self.vintages[0], :]
         self.done = False
         self.reward = None
