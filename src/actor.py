@@ -12,8 +12,8 @@ class Actor(nn.Module):
         self.fc_mu = nn.Linear(hidden_dim, output_dim)
         self.fc_sigma = nn.Linear(hidden_dim, output_dim)
         # init.xavier_normal_(self.lstm.weight)
-        init.xavier_normal_(self.fc_mu.weight)
-        init.xavier_normal_(self.fc_sigma.weight)
+        #  init.xavier_normal_(self.fc_mu.weight)
+        #  init.xavier_normal_(self.fc_sigma.weight)
 
     def forward(self, x):
         x, _ = self.lstm(x)

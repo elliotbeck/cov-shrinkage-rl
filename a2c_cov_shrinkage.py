@@ -119,8 +119,8 @@ def main():
             actions_benchmark.append(benchmark_shrinkage[0])
 
             # # print action
-            # print(str(t) + ", " + str(action) +
-            #       ", ", str(benchmark_shrinkage[0]))
+            print(str(t) + ", " + str(action) +
+                  ", ", str(benchmark_shrinkage[0]))
 
             # get the next state, reward and status
             next_state, reward, done, _ = env.step(action)  # type: ignore

@@ -43,8 +43,8 @@ def update_critic(factor_returns, target, critic, critic_optimizer, device):
     factor_returns = np.expand_dims(factor_returns, axis=0)
     factor_returns = torch.from_numpy(factor_returns).float().to(device)
     state_value = critic(factor_returns)
-    loss = F.mse_loss(state_value.float(), torch.tensor(
-        [target]).float().to(device))
+    loss = F.mse_loss(state_value.float(),
+                      torch.tensor([[target]]).float().to(device))
     critic_optimizer.zero_grad()
     loss.backward()
     critic_optimizer.step()
