@@ -13,7 +13,7 @@ class Critic(nn.Module):
                             num_layers=2, batch_first=True)
         self.fc_value = nn.Linear(hidden_dim, output_dim)
         # init.xavier_normal_(self.lstm.weight)
-        #  init.xavier_normal_(self.fc_value.weight)
+        # init.xavier_normal_(self.fc_value.weight)
 
     def forward(self, x):
         x, _ = self.lstm(x)

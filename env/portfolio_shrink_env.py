@@ -10,10 +10,11 @@ class portfolio_shrink_env(gym.Env):
         super().__init__()
         self.stock_returns = return_data
         self.factor_returns = factor_data
-        self.action_space = gym.spaces.Box(low=0.0,  # type: ignore
-                                           high=1.0,
-                                           shape=(1, ),
-                                           dtype=np.float32)
+        self.action_space = gym.spaces.Box(
+            low=0.0,
+            high=1.0,
+            shape=(1, ),
+            dtype=np.float32)
         self.done = False
         self.reward = None
         self.info = None
@@ -98,7 +99,7 @@ class portfolio_shrink_env(gym.Env):
         '''
         Check whether agent arrive to the endpoint of the epoc
         '''
-        if self.date != self.vintages[-1]:
+        if self.date != self.vintages[-2]:
             self.done = False
         else:
             self.done = True
@@ -107,12 +108,12 @@ class portfolio_shrink_env(gym.Env):
 
     def get_portfolio(self, action):
 
-        # make artificial permnos TODO: replace with real permnos
-        permnos = np.arange(0, 100)
-        permnos_vector = np.repeat(permnos, 1260)
+        # # make artificial permnos TODO: replace with real permnos
+        # permnos = np.arange(0, 100)
+        # permnos_vector = np.repeat(permnos, 1260)
 
         #  transform to wide format
-        self.state_stock_returns_wide = pd.pivot(self.state[0].assign(permno=permnos_vector),  # TODO: Gianluca replace with real permnos
+        self.state_stock_returns_wide = pd.pivot(self.state[0],  # .assign(permno=permnos_vector),  # TODO: Gianluca replace with real permnos
                                                  columns='permno',
                                                  values='stock_return',
                                                  index='date')
